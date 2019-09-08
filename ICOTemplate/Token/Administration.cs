@@ -16,7 +16,6 @@ namespace Neo.SmartContract
             "LockPrivateSaleAllocation",
             "ContractMigrate",
             "EnableTransferFromWhitelisting",
-            "InitSmartContract",
             "UpdateAdminAddress",
             "WhitelistTransferFromAdd",
             "WhitelistTransferFromRemove",
@@ -72,8 +71,6 @@ namespace Neo.SmartContract
                         return false;
                     }
                     return ContractMigrate(args);
-                case "InitSmartContract":
-                    return InitSmartContract();
                 case "LockPrivateSaleAllocation":
                     return LockPrivateSaleAllocation();
                 case "UpdateAdminAddress":
@@ -153,51 +150,11 @@ namespace Neo.SmartContract
         /// <returns></returns>
         public static bool ContractMigrate(object[] args)
         {
-            // Contract Migrate(byte[] script, byte[] parameter_list, byte return_type, bool need_storage, string name, string version, string author, string email, string description)
-            Contract.Migrate((byte[])args[1], (byte[])args[2], (byte)args[3], (bool)args[4], (string)args[5], (string)args[6], (string)args[7], (string)args[8], (string)args[9]);
+            // Contract Migrate(byte[] script, byte[] parameter_list, byte return_type, ContractPropertyState (using storage), string name, string version, string author, string email, string description)
+            Contract.Migrate((byte[])args[1], (byte[])args[2], (byte)args[3], (ContractPropertyState)args[4], (string)args[5], (string)args[6], (string)args[7], (string)args[8], (string)args[9]);
             return true;
         }
-
-        /// <summary>
-        /// initialise the smart contract for use
-        /// </summary>
-        /// <returns></returns>
-        public static bool InitSmartContract()
-        {
-            if (Helpers.ContractInitialised())
-            {
-                // contract can only be initialised once
-                Runtime.Log("InitSmartContract() contract already initialised");
-                return false;
-            }
-
-
-            uint ContractInitTime = Helpers.GetBlockTimestamp();
-            Storage.Put(Storage.CurrentContext, StorageKeys.ContractInitTime(), ContractInitTime);
-
-            // assign pre-allocated tokens to the NosProjectKey() (10,000,000 tokens)
-            BigInteger immediateProjectAllocationValue = ICOTemplate.ImmediateCompanyReserve() * NEP5.factor;
-
-
-            Helpers.SetBalanceOf(ICOTemplate.NosProjectKey, immediateProjectAllocationValue);
-            transfer(null, ICOTemplate.NosProjectKey, immediateProjectAllocationValue);
-
-            // token allocated to private sale & vested reserves & incentives
-            BigInteger presaleAllocationMaxValue = ICOTemplate.LockedTokenAllocationAmount() * NEP5.factor;
-
-            // update the total supply to reflect the project allocated tokens
-            BigInteger totalSupply = immediateProjectAllocationValue + presaleAllocationMaxValue;
-            Helpers.SetTotalSupply(totalSupply);
-
-            UpdateAdminAddress(ICOTemplate.InitialAdminAccount);
-
-            EnableTransferFromWhitelisting(ICOTemplate.WhitelistTransferFromListings());
-
-            Runtime.Log("InitSmartContract() contract initialisation complete");
-            return true;
-        }
-
-
+        
         /// <summary>
         /// allow the contract administrator to update the admin address
         /// </summary>

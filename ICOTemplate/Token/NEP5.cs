@@ -34,8 +34,7 @@ namespace Neo.SmartContract
         /// <returns></returns>
         public static string[] GetNEP5Methods() => new string[] {
             "name", "symbol", "decimals", "totalSupply", "balanceOf",
-            "transfer", "transferFrom", "approve", "allowance",
-            "crowdsale_available_amount", "mintTokens"
+            "transfer", "transferFrom", "approve", "allowance"
         };
 
         [DisplayName("transfer")]
@@ -129,16 +128,6 @@ namespace Neo.SmartContract
                 return Allowance((byte[])args[0], (byte[])args[1]);
             }
 
-            // check how many tokens left for purchase
-            if (operation == "crowdsale_available_amount")
-            {
-                return CrowdsaleAvailableAmount();
-            }
-
-            if (operation == "mintTokens")
-            {
-                return TokenSale.MintTokens();
-            }
             return false;
         }
 
@@ -264,12 +253,6 @@ namespace Neo.SmartContract
         /// <returns></returns>
         public static bool Transfer(byte[] from, byte[] to, BigInteger amount, byte[] caller, byte[] entry)
         {
-            if(Helpers.GetBlockTimestamp() < ICOTemplate.PublicSaleEndTime())
-            {
-                Runtime.Log("Transfer() not available before ICOTemplate.PublicSaleEndTime()");
-                return false;
-            }
-
             if (caller != entry && !Helpers.IsContractWhitelistedTransferFrom(caller))
             {
                 from = caller;
@@ -334,12 +317,6 @@ namespace Neo.SmartContract
         /// <returns></returns>
         public static bool TransferFrom(byte[] originator, byte[] from, byte[] to, BigInteger amount, byte[] caller, byte[] entry)
         {
-            if (Helpers.GetBlockTimestamp() < ICOTemplate.PublicSaleEndTime())
-            {
-                Runtime.Log("TransferFrom() not available before ICOTemplate.PublicSaleEndTime()");
-                return false;
-            }
-
             if (caller != entry && !Helpers.IsContractWhitelistedTransferFrom(caller))
             {
                 originator = caller;
@@ -389,7 +366,7 @@ namespace Neo.SmartContract
             BigInteger newBalance = fromBalance - amount;
             Helpers.SetBalanceOf(from, newBalance + senderAmountSubjectToVesting);                  // remove balance from originating account
             Helpers.SetBalanceOf(to, recipientBalance + recipientAmountSubjectToVesting + amount);  // set new balance for destination account
-            Helpers.SetAllowanceAmount(from.Concat(originator), approvedTransferAmount - amount);   // deduct transferred amount from allowance
+            Helpers.SetAllowanceAmount(from.Concat(to), approvedTransferAmount - amount);   // deduct transferred amount from allowance
 
             transfer(from, to, amount);
             return true;
