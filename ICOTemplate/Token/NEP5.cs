@@ -1,6 +1,5 @@
 ﻿using Neo.SmartContract.Framework;
 using Neo.SmartContract.Framework.Services.Neo;
-using Neo.SmartContract.Framework.Services.System;
 using System;
 using System.ComponentModel;
 using System.Numerics;
@@ -9,10 +8,6 @@ namespace Neo.SmartContract
 {
     public class NEP5 : Framework.SmartContract
     {
-        // define the global system assets NEO/GAS
-        public static readonly byte[] NEO = { 155, 124, 255, 218, 166, 116, 190, 174, 15, 147, 14, 190, 96, 133, 175, 144, 147, 229, 254, 86, 179, 74, 92, 34, 12, 205, 207, 110, 252, 51, 111, 197 };
-        public static readonly byte[] GAS = { 231, 45, 40, 105, 121, 238, 108, 177, 183, 230, 93, 253, 223, 178, 227, 132, 16, 11, 141, 20, 142, 119, 88, 222, 66, 228, 22, 139, 113, 121, 44, 96 };
-
         /// <summary>
         /// NEP5.1 definition: number of decimals for this token - probably best to leave this as-is
         /// </summary>
