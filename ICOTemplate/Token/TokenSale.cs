@@ -9,64 +9,9 @@ namespace Neo.SmartContract
 {
     public class TokenSale : Framework.SmartContract
     {
-        [DisplayName("refund")]
-        public static event Action<byte[], BigInteger, BigInteger> refund;
-
-
-
         [DisplayName("transfer")]
         public static event Action<byte[], byte[], BigInteger> transfer;
-
-        /// <summary>
-        /// determine if user can participate in the token sale yet
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <returns></returns>
-        public static bool CanUserParticipateInSale(object[] transactionData)
-        {
-            Transaction tx = (Transaction)transactionData[0];
-            byte[] sender = (byte[])transactionData[1];
-            byte[] receiver = (byte[])transactionData[2];
-            ulong receivedNEO = (ulong)transactionData[3];
-            ulong receivedGAS = (ulong)transactionData[4];
-            BigInteger whiteListGroupNumber = (BigInteger)transactionData[5];
-            BigInteger crowdsaleAvailableAmount = (BigInteger)transactionData[6];
-            BigInteger groupMaximumContribution = (BigInteger)transactionData[7];
-            BigInteger totalTokensPurchased = (BigInteger)transactionData[8];
-            BigInteger neoRemainingAfterPurchase = (BigInteger)transactionData[9];
-            BigInteger gasRemainingAfterPurchase = (BigInteger)transactionData[10];
-            BigInteger totalContributionBalance = (BigInteger)transactionData[11];
-
-            if (whiteListGroupNumber <= 0)
-            {
-                Runtime.Notify("CanUserParticipate() sender is not whitelisted", sender);
-                return false;
-            }
-
-            if (!KYC.GroupParticipationIsUnlocked((int)whiteListGroupNumber))
-            {
-                Runtime.Notify("CanUserParticipate() sender cannot participate yet", sender);
-                return false;
-            }
-
-            if (crowdsaleAvailableAmount <= 0)
-            {
-                // total supply has been exhausted
-                Runtime.Notify("CanUserParticipate() crowdsaleAvailableAmount is <= 0", crowdsaleAvailableAmount);
-                return false;
-            }
-
-            if (totalContributionBalance > groupMaximumContribution)
-            {
-                // don't allow this purchase exceed the group cap
-                Runtime.Notify("CanUserParticipate() senders purchase will exceed maxContribution cap", sender, totalContributionBalance, groupMaximumContribution);
-                refund(sender, receivedNEO, receivedGAS);
-                return false;
-            }
-
-            return true;
-        }
-
+        
      
         /// <summary>
         /// set a vesting schedule, as defined in the whitepaper, for tokens purchased during the presale

@@ -187,7 +187,7 @@ namespace Neo.SmartContract
         /// list NEPs supported by this contract
         /// </summary>
         /// <returns></returns>
-        public static string SupportedStandards() => "{\"NEP-5\", \"NEP-10\"}";
+        public static string[] SupportedStandards() => new string[] { "NEP-5", "NEP-10" };
 
         /// <summary>
         /// should whitelisting of TransferFrom transfer/transferFrom methods be checked
@@ -231,15 +231,6 @@ namespace Neo.SmartContract
                         }
                     }
                     return false;
-                }
-
-                // test if a kyc method is being invoked
-                foreach (string kycMethod in KYC.GetKYCMethods())
-                {
-                    if (kycMethod == operation)
-                    {
-                        return KYC.HandleKYCOperation(operation, args);
-                    }
                 }
 
                 // test if a helper/misc method is being invoked

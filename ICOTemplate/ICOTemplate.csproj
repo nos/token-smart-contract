@@ -48,7 +48,6 @@
     <Compile Include="ICOTemplate.cs" />
     <Compile Include="Token\Administration.cs" />
     <Compile Include="Token\Helpers.cs" />
-    <Compile Include="Token\KYC.cs" />
     <Compile Include="Token\NEP5.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Token\StorageKeys.cs" />
