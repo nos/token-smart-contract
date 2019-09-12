@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Neo.SmartContract.Framework, Version=2.7.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Neo.SmartContract.Framework.2.7.3\lib\net40\Neo.SmartContract.Framework.dll</HintPath>
+    <Reference Include="Neo.SmartContract.Framework, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Neo.SmartContract.Framework.2.9.3.1\lib\net40\Neo.SmartContract.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -47,9 +47,7 @@
   <ItemGroup>
     <Compile Include="ICOTemplate.cs" />
     <Compile Include="Token\Administration.cs" />
-    <Compile Include="Token\EthSale.cs" />
     <Compile Include="Token\Helpers.cs" />
-    <Compile Include="Token\KYC.cs" />
     <Compile Include="Token\NEP5.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Token\StorageKeys.cs" />

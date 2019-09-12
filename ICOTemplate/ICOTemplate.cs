@@ -187,7 +187,7 @@ namespace Neo.SmartContract
         /// list NEPs supported by this contract
         /// </summary>
         /// <returns></returns>
-        public static string SupportedStandards() => "{\"NEP-5\", \"NEP-10\"}";
+        public static string[] SupportedStandards() => new string[] { "NEP-5", "NEP-10" };
 
         /// <summary>
         /// should whitelisting of TransferFrom transfer/transferFrom methods be checked
@@ -209,11 +209,14 @@ namespace Neo.SmartContract
         {
             if (Runtime.Trigger == TriggerType.Application)
             {
-                //Only allow InitSmartContract if contract not initialized and not calling whitelist/KYC operations
-                if(!Helpers.ContractInitialised() && ((operation != "admin" && (string) args[0] != "InitSmartContract") && operation != "AddAddress" && operation != "RevokeAddress" && operation != "GetGroupNumber" && operation != "crowdsale_status"))
+
+                // test if a nep5 method is being invoked
+                foreach (string nepMethod in NEP5.GetNEP5Methods())
                 {
-                    Runtime.Log("Smart Contract not Initialised");
-                    return false;
+                    if (nepMethod == operation)
+                    {
+                        return NEP5.HandleNEP5Operation(operation, args, ExecutionEngine.CallingScriptHash, ExecutionEngine.EntryScriptHash);
+                    }
                 }
 
                 if (operation == "admin" && Helpers.VerifyIsAdminAccount())
@@ -230,40 +233,12 @@ namespace Neo.SmartContract
                     return false;
                 }
 
-                // test if a nep5 method is being invoked
-                foreach (string nepMethod in NEP5.GetNEP5Methods())
-                {
-                    if (nepMethod == operation)
-                    {
-                        return NEP5.HandleNEP5Operation(operation, args, ExecutionEngine.CallingScriptHash, ExecutionEngine.EntryScriptHash);
-                    }
-                }
-
-                // test if a kyc method is being invoked
-                foreach (string kycMethod in KYC.GetKYCMethods())
-                {
-                    if (kycMethod == operation)
-                    {
-                        return KYC.HandleKYCOperation(operation, args);
-                    }
-                }
-
                 // test if a helper/misc method is being invoked
                 foreach (string helperMethod in Helpers.GetHelperMethods())
                 {
                     if (helperMethod == operation)
                     {
                         return Helpers.HandleHelperOperation(operation, args);
-                    }
-                }
-
-                //If MintTokensEth operation
-                if(operation == "MintTokensEth")
-                {
-                    // Method can only be called by the ETH contributions listener account
-                    if (Helpers.VerifyWitness(ICOTemplate.EthContributionListenerKey) && Helpers.RequireArgumentLength(args,3))
-                    {
-                        return EthSale.MintTokensEth((string)args[0], (byte[])args[1], (ulong)args[2]);
                     }
                 }
 
@@ -274,12 +249,8 @@ namespace Neo.SmartContract
                 {
                     return true;
                 }
-
-                // test if this transaction is allowed
-                object[] transactionData = Helpers.GetTransactionAndSaleData();
-                return TokenSale.CanUserParticipateInSale(transactionData);
             }
-
+        
             return false;
         }
 
